@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Email Verification</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+      .card {
+        border-radius: 15px;
+        padding: 50px 40px;
+        background-color: white;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 350px;
+        max-width: 500px;
+        margin: 20px;
+      }
+      .icon {
+        font-size: 80px;
+        margin-bottom: 25px;
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px;
+      }
+      .success {
+        color: #28a745;
+        background-color: #d4edda;
+        border: 2px solid #c3e6cb;
+      }
+      .error {
+        color: #dc3545;
+        background-color: #f8d7da;
+        border: 2px solid #f5c6cb;
+      }
+      .help {
+        color: #6c757d;
+        background-color: #e2e3e5;
+        border: 2px solid #d6d8db;
+      }
+      .hidden {
+        display: none;
+      }
+      .button-styled {
+        text-decoration: none;
+        margin-top: 25px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 25px;
+        padding: 12px 30px;
+        border: none;
+        cursor: pointer;
+        display: inline-block;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+      }
+      .button-styled:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+      }
+      .status-message {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 20px;
+        line-height: 1.5;
+        max-width: 400px;
+      }
+      .title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: #333;
+      }
+      .subtitle {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <div class="icon" id="statusIcon">
+        <span id="iconText"></span>
+      </div>
+      <div class="title" id="titleText"></div>
+      <div class="status-message" id="statusMessage"></div>
+      <div class="subtitle" id="subtitleText"></div>
+      <a href="http://localhost:5173/" class="button-styled hidden" id="btn">Go to Login</a>
+    </div>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const status = urlParams.get("status");
+      const message = urlParams.get("message");
+
+      const btn = document.getElementById("btn");
+      const statusIcon = document.getElementById("statusIcon");
+      const iconText = document.getElementById("iconText");
+      const titleText = document.getElementById("titleText");
+      const statusMessage = document.getElementById("statusMessage");
+      const subtitleText = document.getElementById("subtitleText");
+
+      // Decode the message if it exists
+      const decodedMessage = message ? decodeURIComponent(message) : "";
+
+      if (status === "success") {
+        iconText.innerHTML = "✓";
+        statusIcon.classList.add("success");
+        titleText.textContent = "Email Verified Successfully!";
+        statusMessage.textContent = decodedMessage || "Your email has been successfully verified.";
+        subtitleText.textContent = "You can now log in to your account.";
+        btn.classList.remove("hidden");
+      } else if (status === "error") {
+        iconText.innerHTML = "✗";
+        statusIcon.classList.add("error");
+        titleText.textContent = "Verification Failed";
+        statusMessage.textContent = decodedMessage || "Email verification failed. Please try again.";
+        subtitleText.textContent = "Please check your email for a new verification link or contact support.";
+        // Button remains hidden for errors
+      } else {
+        iconText.innerHTML = "❓";
+        statusIcon.classList.add("help");
+        titleText.textContent = "Invalid Verification Link";
+        statusMessage.textContent = "Something went wrong. This verification link is invalid or has expired.";
+        subtitleText.textContent = "Please check your email for a valid verification link or request a new one.";
+        // Button remains hidden for invalid links
+      }
+    </script>
+  </body>
+</html>
