@@ -26,7 +26,7 @@ router.get("/reset-password/:userId/:token", resetPassword);
 router.post("/reset-password", changePassword);
 
 //user routes
-router.post("/get-user/:id", userAuth, getUser);
+router.post("/get-user", userAuth, getUser);
 router.post("/update-user", userAuth, updateUser);
 
 //friend request
@@ -37,10 +37,10 @@ router.post("/get-friend-request", userAuth, getFriendRequest);
 router.post("/accept-request", userAuth, acceptRequest);
 
 //view profile
-router.post("profile-view", userAuth, profileViews);
+router.post("/profile-view", userAuth, profileViews);
 
 //suggested friends
-router.post("suggested-friends", userAuth, suggestedFriends);
+router.post("/suggested-friends", userAuth, suggestedFriends);
 
 router.get("/verified", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "verifiedpage.html"));

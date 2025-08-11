@@ -10,7 +10,7 @@ import {
   likePostComment,
   commentPost,
   replyPostComment,
-  deletePost
+  deletePost,
 } from "../controllers/postController.js";
 
 const router = express.Router();
@@ -26,11 +26,12 @@ router.post("/get-user-posts/:id", userAuth, getUserPosts);
 router.get("/comments/:postId", getComments);
 //like or comment on posts
 router.post("/like/:id", userAuth, likePost);
+router.post("/like-comment/:id", userAuth, likePostComment);
 router.post("/like-comment/:id/:rid", userAuth, likePostComment);
 router.post("/comment/:id", userAuth, commentPost);
 router.post("/reply-comment/:id", userAuth, replyPostComment);
 
 //delete post
-router.delete("/:id",userAuth,deletePost);
+router.delete("/:id", userAuth, deletePost);
 
 export default router;

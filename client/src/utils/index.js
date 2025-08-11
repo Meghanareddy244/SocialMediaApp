@@ -28,17 +28,19 @@ export const apiRequest = async ({ url, token, data, method }) => {
 };
 
 export const handleFileUpload = async (uploadFile) => {
+  try {
+  console.log("uploadFile", uploadFile);
   const formData = new FormData();
   formData.append("file", uploadFile);
   formData.append("upload_preset", "SocialMediaApp");
-  try {
     const response = await axios.post(
       `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_ID}/image/upload`,
       formData
     );
+    console.log("response", response);
     return response.data.secure_url;
   } catch (error) {
-    console.log(error);
+    console.log("error", error);
   }
 };
 
@@ -91,6 +93,7 @@ export const getUserInfo = async (token, id) => {
       token: token,
       method: "POST",
     });
+    console.log(res);
 
     if (res?.message === "Authentication failed") {
       localStorage.removeItem("user");
@@ -107,12 +110,12 @@ export const getUserInfo = async (token, id) => {
 export const sendFriendRequest = async (token, id) => {
   try {
     const res = await apiRequest({
-      url: "/users/friend-request/",
+      url: "/users/friend-request",
       token: token,
       method: "POST",
       data: { requestTo: id },
     });
-    return;
+    return res;
   } catch (error) {
     console.log(error);
   }

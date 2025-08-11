@@ -10,19 +10,28 @@ import {
   PostCard,
   EditProfile,
 } from "../components";
-import { suggest, requests} from "../assets/data";
+
 import { NoProfile } from "../assets";
 import { Link } from "react-router-dom";
 import { BsFiletypeGif, BsPersonFillAdd } from "react-icons/bs";
 import { useForm } from "react-hook-form";
 import { BiImages, BiSolidVideo } from "react-icons/bi";
-import { apiRequest, fetchPosts, handleFileUpload } from "../utils";
+import {
+  apiRequest,
+  deletePost,
+  fetchPosts,
+  handleFileUpload,
+  likePost,
+  sendFriendRequest,
+  getUserInfo,
+} from "../utils";
+import { login } from "../redux/userSlice";
 
 const Home = () => {
   const { user, edit } = useSelector((state) => state.user);
-  const { posts }=useSelector(state => state.posts);
-  const [friendRequest, setFriendRequest] = useState(requests);
-  const [suggestedFriends, setSuggestedFriends] = useState(suggest);
+  const { posts } = useSelector((state) => state.posts);
+  const [friendRequest, setFriendRequest] = useState([]);
+  const [suggestedFriends, setSuggestedFriends] = useState([]);
   const [posting, setPosting] = useState(false);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
@@ -65,16 +74,81 @@ const Home = () => {
   const fetchPost = async () => {
     await fetchPosts(user?.token, dispatch);
     setLoading(false);
-    console.log("posts",posts);
+    console.log("posts", posts);
   };
 
-  const handleLikePost = async () => {};
-  const handleDelete = async () => {};
-  const fetchFriendRequests = async () => {};
-  const fetchSuggestedFriends = async () => {};
-  const handleFriendRequest = async () => {};
-  const acceptFriendRequest = async () => {};
-  const getUser = async () => {};
+  const handleLikePost = async (uri) => {
+    await likePost(uri, user?.token);
+    await fetchPost();
+  };
+
+  const handleDelete = async (id) => {
+    await deletePost(id, user.token);
+    await fetchPost();
+  };
+
+  const fetchFriendRequests = async () => {
+    try {
+      console.log("Fetching friend requests for user:", user?._id);
+      const res = await apiRequest({
+        url: "/users/get-friend-request",
+        token: user?.token,
+        method: "POST",
+      });
+      console.log("Friend requests response:", res);
+      if (res?.success) {
+        setFriendRequest(res?.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchSuggestedFriends = async () => {
+    try {
+      const res = await apiRequest({
+        url: "/users/suggested-friends",
+        token: user?.token,
+        method: "POST",
+      });
+      setSuggestedFriends(res?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleFriendRequest = async (id) => {
+    try {
+      console.log("Sending friend request to user:", id);
+      const res = await sendFriendRequest(user?.token, id);
+      console.log("Friend request sent:", res);
+      await fetchSuggestedFriends();
+      // Refresh friend requests to show any new ones
+      await fetchFriendRequests();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const acceptFriendRequest = async (id, status) => {
+    try {
+      const res = await apiRequest({
+        url: "/users/accept-request",
+        token: user?.token,
+        method: "POST",
+        data: { rid: id, status },
+      });
+      setFriendRequest(res?.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getUser = async () => {
+    const res = await getUserInfo(user?.token);
+    const newData = { token: user?.token, ...res };
+    dispatch(login(newData));
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -82,6 +156,7 @@ const Home = () => {
     fetchPost();
     fetchFriendRequests();
     fetchSuggestedFriends();
+    console.log("Home component mounted, fetching data...");
   }, []);
 
   return (
@@ -177,9 +252,8 @@ const Home = () => {
                   {posting ? (
                     // <Loading />
                     <>
-                    <p className="bg-red-500">Loading</p>
+                      <p className="bg-red-500">Loading</p>
                     </>
-
                   ) : (
                     <CustomButton
                       type="submit"
@@ -198,8 +272,8 @@ const Home = () => {
                   key={post?._id}
                   post={post}
                   user={user}
-                  deletePost={() => {}}
-                  likePost={() => {}}
+                  deletePost={handleDelete}
+                  likePost={handleLikePost}
                 />
               ))
             ) : (
@@ -240,11 +314,13 @@ const Home = () => {
                     <div className="flex gap-1">
                       <CustomButton
                         title="Accept"
-                        containerStyles="bg-[#0444a4] text-xs text-white px-1.5 py-1 rounded-full"
+                        onClick={() => acceptFriendRequest(_id, "Accepted")}
+                        containerStyles="bg-[#0444a4] text-xs text-white px-1.5 py-1 rounded-full cursor-pointer"
                       />
                       <CustomButton
                         title="Deny"
-                        containerStyles="border border-[#666] text-ascent-1 text-xs px-1.5 py-1 rounded-full"
+                        onClick={() => acceptFriendRequest(_id, "Denied")}
+                        containerStyles="border border-[#666] text-ascent-1 text-xs px-1.5 py-1 rounded-full cursor-pointer"
                       />
                     </div>
                   </div>
@@ -283,8 +359,8 @@ const Home = () => {
                     </Link>
                     <div className="flex gap-1">
                       <button
-                        className="bg-[#0444a4] text-sm text-white p-1 rounded"
-                        onClick={() => {}}
+                        className="bg-[#0444a4] text-sm text-white p-1 rounded cursor-pointer"
+                        onClick={() => handleFriendRequest(friend?._id)}
                       >
                         <BsPersonFillAdd
                           size={20}

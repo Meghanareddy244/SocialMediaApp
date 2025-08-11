@@ -401,7 +401,9 @@ export const friendRequest = async (req, res, next) => {
     }
     const newRes = await FriendRequest.create({
       requestFrom: userId,
+      requestTo: requestTo,
     });
+    console.log("Created friend request:", newRes);
     res.status(201).json({
       success: true,
       message: "Friend request sent successfully",
@@ -419,9 +421,10 @@ export const friendRequest = async (req, res, next) => {
 export const getFriendRequest = async (req, res) => {
   try {
     const { userId } = req.user;
+    console.log("Looking for friend requests for user:", userId);
     const request = await FriendRequest.find({
       requestTo: userId,
-      requestStatus: "pending",
+      requestStatus: "Pending",
     })
       .populate({
         path: "requestFrom",
@@ -431,6 +434,7 @@ export const getFriendRequest = async (req, res) => {
       .sort({
         _id: -1,
       });
+    console.log("Found friend requests:", request);
     res.status(200).json({
       success: true,
       data: request,
@@ -510,7 +514,7 @@ export const profileViews = async (req, res, next) => {
 
 export const suggestedFriends = async (req, res) => {
   try {
-    const { userId } = req.body.user;
+    const { userId } = req.user;
     let queryObject = {};
     queryObject._id = { $ne: userId };
     queryObject.friends = { $nin: [userId] };
