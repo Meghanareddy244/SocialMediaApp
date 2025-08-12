@@ -29,10 +29,10 @@ export const apiRequest = async ({ url, token, data, method }) => {
 
 export const handleFileUpload = async (uploadFile) => {
   try {
-  console.log("uploadFile", uploadFile);
-  const formData = new FormData();
-  formData.append("file", uploadFile);
-  formData.append("upload_preset", "SocialMediaApp");
+    console.log("uploadFile", uploadFile);
+    const formData = new FormData();
+    formData.append("file", uploadFile);
+    formData.append("upload_preset", "SocialMediaApp");
     const response = await axios.post(
       `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_ID}/image/upload`,
       formData

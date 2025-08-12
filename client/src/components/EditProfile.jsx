@@ -14,8 +14,6 @@ const EditProfile = () => {
   const [picture, setPicture] = useState(null);
   const [imagePreview, setImagePreview] = useState(user?.profileUrl ?? "");
 
-  console.log("5. Component re-rendering with imagePreview:", imagePreview);
-
   const {
     register,
     handleSubmit,

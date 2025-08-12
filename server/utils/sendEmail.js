@@ -20,7 +20,7 @@ let transporter = nodemailer.createTransport({
 export const sendVerificationEmail = async (user, res) => {
   const { _id, email, lastName } = user;
   const token = _id + uuidv4();
-  const url = APP_URL !== undefined ? APP_URL : "http://localhost:5173";
+  const url = APP_URL !== undefined ? APP_URL : "https://mern-socialmedia-9s33.onrender.com";
   const link = url + "/users/verify/" + _id + "/" + token;
 
   const mailOptions = {
@@ -73,7 +73,7 @@ export const sendVerificationEmail = async (user, res) => {
 export const resetPasswordLink = async (user, res) => {
   const { _id, email } = user;
   const token = _id + uuidv4();
-  const url = APP_URL !== undefined ? APP_URL : "http://localhost:5173";
+  const url = APP_URL !== undefined ? APP_URL : "https://mern-socialmedia-9s33.onrender.com";
   const link = url + "/users/reset-password/" + _id + "/" + token;
 
   const mailOptions = {

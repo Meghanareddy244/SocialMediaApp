@@ -6,5 +6,5 @@ const store=configureStore({
     reducer: rootReducer,
 })
 
-const {dispatch}=store;
+const {dispatch} = store;
 export {store,dispatch};

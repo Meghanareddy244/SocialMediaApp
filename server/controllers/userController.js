@@ -306,7 +306,7 @@ export const changePassword = async (req, res, next) => {
   }
 };
 
-export const getUser = async (req, res, next) => {
+export const getUser= async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { id } = req.params;

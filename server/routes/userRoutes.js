@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import upload from "../utils/multer.js";
 import {
   changePassword,
   requestPasswordReset,
@@ -13,6 +12,7 @@ import {
   acceptRequest,
   suggestedFriends,
   profileViews,
+
 } from "../controllers/userController.js";
 import userAuth from "../middleware/authMiddleware.js";
 
@@ -27,6 +27,7 @@ router.post("/reset-password", changePassword);
 
 //user routes
 router.post("/get-user", userAuth, getUser);
+router.post("/get-user/:id", userAuth, getUser);
 router.post("/update-user", userAuth, updateUser);
 
 //friend request
