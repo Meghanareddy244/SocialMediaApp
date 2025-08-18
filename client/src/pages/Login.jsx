@@ -92,12 +92,12 @@ const Login = () => {
               labelStyle="ml-2"
               error={errors.password ? errors.password.message : ""}
             />
-            <Link
+            {/* <Link
               to="/reset-password"
               className="text-sm text-right text-blue-600 font-semibold"
             >
               Forgot Password{" "}
-            </Link>
+            </Link> */}
             {errMsg?.message && (
               <span
                 className={`text-sm ${
