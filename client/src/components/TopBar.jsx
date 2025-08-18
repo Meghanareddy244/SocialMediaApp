@@ -2,10 +2,10 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { TbSocial } from "react-icons/tb";
-import {TextInput, CustomButton } from "../components";
+import { TextInput, CustomButton } from "../components";
 import { useForm } from "react-hook-form";
-import {IoMdNotificationsOutline} from 'react-icons/io';  
-import {BsMoon ,BsSunFill} from 'react-icons/bs';
+import { IoMdNotificationsOutline } from "react-icons/io";
+import { BsMoon, BsSunFill } from "react-icons/bs";
 import { SetTheme } from "../redux/theme";
 import { logout } from "../redux/userSlice";
 import { fetchPosts } from "../utils";
@@ -15,15 +15,15 @@ const TopBar = () => {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
-  const {register,handleSubmit,formState:{errors}}=useForm();
+  const { register, handleSubmit } = useForm();
 
-  const handleTheme=()=>{
-    const themeValue=theme==="light"?"dark":"light";
+  const handleTheme = () => {
+    const themeValue = theme === "light" ? "dark" : "light";
     dispatch(SetTheme(themeValue));
-  }
+  };
 
-  const handleSearch=async(data)=>{
-    await fetchPosts(user.token, dispatch,"",data);
+  const handleSearch = async (data) => {
+    await fetchPosts(user.token, dispatch, "", data);
   };
 
   return (
@@ -35,33 +35,36 @@ const TopBar = () => {
         <span className="text-2xl text-[#065ad8] font-semibold">ShareFun</span>
       </Link>
       <form
-      className="hidden md:flex items-center justify-center"
-      onSubmit={handleSubmit(handleSearch)}>
+        className="hidden md:flex items-center justify-center"
+        onSubmit={handleSubmit(handleSearch)}
+      >
         <TextInput
-        placeholder="Search..."
-        styles='w-[18rem] lg:w-[38rem] rounded-l-full py-3'
-        register={register("search")} 
+          placeholder="Search..."
+          styles="w-[18rem] lg:w-[38rem] rounded-l-full py-3"
+          register={register("search")}
         />
         <CustomButton
-        type="submit"
-        containerStyles='bg-[#0444a4] text-white px-6 py-2.5 mt-2 rounded-r-full cursor-pointer'
-        title="Search"
+          type="submit"
+          containerStyles="bg-[#0444a4] text-white px-6 py-2.5 mt-2 rounded-r-full cursor-pointer"
+          title="Search"
         />
       </form>
-        {/* Icons */}
-        <div className="flex gap-4 items-center text-ascent-1 text-md md:text-xl">
-         <button onClick={()=>handleTheme()}>{theme ? <BsMoon /> : <BsSunFill />}</button>
-         <div className="hidden lg:flex">
-            <IoMdNotificationsOutline />
-         </div>
-         <div>
-            <CustomButton
-            title="Logout"
-            onClick={()=>dispatch(logout())}
-            containerStyles='text-sm text-ascent-1 px-4 md:px-6 py-1 md:py-2 border border-[#666] rounded-full'/>
-         </div>
+      {/* Icons */}
+      <div className="flex gap-4 items-center text-ascent-1 text-md md:text-xl">
+        <button onClick={() => handleTheme()}>
+          {theme ? <BsMoon /> : <BsSunFill />}
+        </button>
+        <div className="hidden lg:flex">
+          <IoMdNotificationsOutline />
         </div>
-
+        <div>
+          <CustomButton
+            title="Logout"
+            onClick={() => dispatch(logout())}
+            containerStyles="text-sm text-ascent-1 px-4 md:px-6 py-1 md:py-2 border border-[#666] rounded-full"
+          />
+        </div>
+      </div>
     </div>
   );
 };

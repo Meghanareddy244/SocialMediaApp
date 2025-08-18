@@ -7,29 +7,29 @@ import {
   FriendsCard,
   Loading,
   PostCard,
+  EditProfile,
 } from "../components";
-import { deletePost, fetchPosts, getUserInfo, likePost} from "../utils";
+import { deletePost, fetchPosts, getUserInfo, likePost } from "../utils";
 
 const Profile = () => {
-
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.user);
+  const { user, edit } = useSelector((state) => state.user);
   const [userInfo, setUserInfo] = useState(user);
-  const {posts}=useSelector((state)=>state.posts);
+  const { posts } = useSelector((state) => state.posts);
   const [loading, setLoading] = useState(false);
 
   const uri = "/posts/get-user-posts/" + id;
 
   const getUser = async () => {
     const res = await getUserInfo(user?.token, id);
-    setUserInfo(res); 
-  }
+    setUserInfo(res);
+  };
 
   const getPosts = async () => {
     await fetchPosts(user.token, dispatch, uri);
     setLoading(false);
-  }
+  };
 
   const handleDelete = async (id) => {
     await deletePost(id, user.token);
@@ -40,11 +40,11 @@ const Profile = () => {
     await getPosts();
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     setLoading(true);
     getUser();
     getPosts();
-  },[id]);
+  }, [id]);
 
   return (
     <>
@@ -58,32 +58,32 @@ const Profile = () => {
             </div>
           </div>
 
-        <div className="flex-1 h-full bg-ordinary px-4 flex flex-col gap-6 overflow-y-auto">
-          {loading ? (
-            <Loading />
-          ) : posts?.length > 0 ? (
-            posts?.map((post) => (
-              <PostCard
-                post={post}
-                key={post?._id}
-                user={user}
-                deletePost={handleDelete}
-                likePost={handleLikePost}
-              />
-            ))
-          ) : (
-            <div className="flex w-full h-full items-center justify-center">
-              <p className="text-lg text-ascent-2">No Posts Available</p>
-            </div>
-          )}
-        </div>
+          <div className="flex-1 h-full bg-ordinary px-4 flex flex-col gap-6 overflow-y-auto">
+            {loading ? (
+              <Loading />
+            ) : posts?.length > 0 ? (
+              posts?.map((post) => (
+                <PostCard
+                  post={post}
+                  key={post?._id}
+                  user={user}
+                  deletePost={handleDelete}
+                  likePost={handleLikePost}
+                />
+              ))
+            ) : (
+              <div className="flex w-full h-full items-center justify-center">
+                <p className="text-lg text-ascent-2">No Posts Available</p>
+              </div>
+            )}
+          </div>
 
-        <div className="hidden w-1/3 lg:1/4 h-full md:flex flex-col gap-6 overflow-y-auto">
-          <FriendsCard friends={userInfo?.friends} />
+          <div className="hidden w-1/3 lg:1/4 h-full md:flex flex-col gap-6 overflow-y-auto">
+            <FriendsCard friends={userInfo?.friends} />
+          </div>
         </div>
-
-       </div>
       </div>
+      {edit && <EditProfile />}
     </>
   );
 };

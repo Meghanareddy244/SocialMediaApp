@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   TopBar,
@@ -43,6 +43,84 @@ const Home = () => {
   } = useForm();
   const [errMsg, setErrMsg] = useState("");
   const [file, setFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const [fileType, setFileType] = useState(null);
+  const imageInputRef = useRef(null);
+  const videoInputRef = useRef(null);
+  const gifInputRef = useRef(null);
+
+  const handleFileSelect = (e, type) => {
+    const selectedFile = e.target.files[0];
+    console.log("File selected:", selectedFile, "Type:", type);
+
+    if (selectedFile) {
+      // Validate file type
+      const validTypes = {
+        image: ["image/jpeg", "image/jpg", "image/png"],
+        video: ["video/mp4", "video/wav"],
+        gif: ["image/gif"],
+      };
+
+      if (!validTypes[type].includes(selectedFile.type)) {
+        alert(`Please select a valid ${type} file`);
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (selectedFile.size > 5 * 1024 * 1024) {
+        alert("File size should be less than 5MB");
+        return;
+      }
+
+      setFile(selectedFile);
+      setFileType(type);
+
+      // Create preview
+      if (type === "image" || type === "gif") {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setFilePreview(event.target.result);
+        };
+        reader.onerror = (error) => {
+          console.error("Error reading file:", error);
+          alert("Error reading file. Please try again.");
+        };
+        reader.readAsDataURL(selectedFile);
+      } else if (type === "video") {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setFilePreview(event.target.result);
+        };
+        reader.onerror = (error) => {
+          console.error("Error reading file:", error);
+          alert("Error reading file. Please try again.");
+        };
+        reader.readAsDataURL(selectedFile);
+      }
+    }
+  };
+
+  const handleFileButtonClick = (type) => {
+    switch (type) {
+      case "image":
+        imageInputRef.current?.click();
+        break;
+      case "video":
+        videoInputRef.current?.click();
+        break;
+      case "gif":
+        gifInputRef.current?.click();
+        break;
+      default:
+        break;
+    }
+  };
+
+  const clearFile = () => {
+    setFile(null);
+    setFilePreview(null);
+    setFileType(null);
+  };
 
   const handlePostSubmit = async (data) => {
     setPosting(true);
@@ -61,6 +139,8 @@ const Home = () => {
       } else {
         reset({ description: "" });
         setFile(null);
+        setFilePreview(null);
+        setFileType(null);
         setErrMsg("");
         await fetchPost();
       }
@@ -202,58 +282,83 @@ const Home = () => {
                   {errMsg.message}
                 </span>
               )}
+
+              {/* File Preview Section */}
+              {filePreview && (
+                <div className="py-4 border-t border-[#66666645]">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium text-ascent-1">
+                      {fileType === "image"
+                        ? "Image"
+                        : fileType === "video"
+                        ? "Video"
+                        : "GIF"}{" "}
+                      Preview
+                    </span>
+                    <button
+                      type="button"
+                      onClick={clearFile}
+                      className="text-red-500 hover:text-red-700 text-sm"
+                    >
+                      Remove
+                    </button>
+                  </div>
+
+                  <div className="relative max-w-xs mx-auto">
+                    {fileType === "image" || fileType === "gif" ? (
+                      <img
+                        src={filePreview}
+                        alt="File Preview"
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                    ) : fileType === "video" ? (
+                      <video
+                        src={filePreview}
+                        controls
+                        className="w-full h-48 object-cover rounded-lg"
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : null}
+
+                    <div className="mt-2 text-center">
+                      <span className="text-xs text-ascent-2">
+                        {file?.name}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* File Upload Buttons */}
               <div className="flex items-center justify-between py-4">
-                <label
-                  htmlFor="imgUpload"
+                <button
+                  type="button"
+                  onClick={() => handleFileButtonClick("image")}
                   className="flex items-center gap-1 text-base text-ascent-2 hover:text-gray-700 cursor-pointer"
                 >
-                  <input
-                    type="file"
-                    onChange={(e) => setFile(e.target.files[0])}
-                    className="hidden"
-                    id="imgUpload"
-                    data-max-size="5120"
-                    accept=".jpg, .png, .jpeg"
-                  />
                   <BiImages />
                   <span>Image</span>
-                </label>
-                <label
-                  htmlFor="videoUpload"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleFileButtonClick("video")}
                   className="flex items-center gap-1 text-base text-ascent-2 hover:text-gray-700 cursor-pointer"
                 >
-                  <input
-                    type="file"
-                    onChange={(e) => setFile(e.target.files[0])}
-                    className="hidden"
-                    id="videoUpload"
-                    data-max-size="5120"
-                    accept=".mp4, .wav"
-                  />
                   <BiSolidVideo />
                   <span>Video</span>
-                </label>
-                <label
-                  htmlFor="vgifUpload"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleFileButtonClick("gif")}
                   className="flex items-center gap-1 text-base text-ascent-2 hover:text-gray-700 cursor-pointer"
                 >
-                  <input
-                    type="file"
-                    onChange={(e) => setFile(e.target.files[0])}
-                    className="hidden"
-                    id="vgifUpload"
-                    data-max-size="5120"
-                    accept=".gif"
-                  />
                   <BsFiletypeGif />
                   <span>Gif</span>
-                </label>
+                </button>
                 <div>
                   {posting ? (
-                    // <Loading />
-                    <>
-                      <p className="bg-red-500">Loading</p>
-                    </>
+                    <Loading />
                   ) : (
                     <CustomButton
                       type="submit"
@@ -263,6 +368,29 @@ const Home = () => {
                   )}
                 </div>
               </div>
+
+              {/* Hidden file inputs */}
+              <input
+                ref={imageInputRef}
+                type="file"
+                className="hidden"
+                onChange={(e) => handleFileSelect(e, "image")}
+                accept=".jpg, .png, .jpeg"
+              />
+              <input
+                ref={videoInputRef}
+                type="file"
+                className="hidden"
+                onChange={(e) => handleFileSelect(e, "video")}
+                accept=".mp4, .wav"
+              />
+              <input
+                ref={gifInputRef}
+                type="file"
+                className="hidden"
+                onChange={(e) => handleFileSelect(e, "gif")}
+                accept=".gif"
+              />
             </form>
             {loading ? (
               <Loading />
@@ -364,7 +492,8 @@ const Home = () => {
                       >
                         <BsPersonFillAdd
                           size={20}
-                          className="text-[#0f52bb6]"
+                          className="text-white"
+                          style={{ color: "white" }}
                         />
                       </button>
                     </div>

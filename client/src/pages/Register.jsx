@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TbSocial } from "react-icons/tb";
 import { TextInput, Loading, CustomButton } from "../components";
-import { useDispatch } from "react-redux";
+//import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { BgImg } from "../assets";
@@ -13,7 +13,7 @@ import { apiRequest } from "../utils";
 const Register = () => {
   const [errMsg, setErrMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const dispatch = useDispatch();
+  //const dispatch = useDispatch();
   const {
     register,
     handleSubmit,

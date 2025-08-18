@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { MdClose } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
@@ -13,6 +13,7 @@ const EditProfile = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [picture, setPicture] = useState(null);
   const [imagePreview, setImagePreview] = useState(user?.profileUrl ?? "");
+  const fileInputRef = useRef(null);
 
   const {
     register,
@@ -62,29 +63,40 @@ const EditProfile = () => {
     dispatch(updateProfile(false));
   };
 
-  const handleSelect = (e) => {
-    console.log("1. handleSelect triggered");
-
+  const handleFileSelect = (e) => {
     const file = e.target.files[0];
+    console.log("File selected:", file);
+
     if (file) {
-      console.log("2. File object found:", file);
-      setPicture(file);
-      // Use FileReader to create a base64 preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        console.log("4. FileReader finished. Setting preview.");
-        setImagePreview(reader.result);
-      };
-      reader.onerror = (error) => {
-        console.error("FileReader Error:", error);
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        alert("Please select an image file");
+        return;
       }
 
-      // --- DEBUG LOG 3 ---
-      console.log("3. FileReader process started");
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File size should be less than 5MB");
+        return;
+      }
+
+      setPicture(file);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImagePreview(event.target.result);
+      };
+      reader.onerror = (error) => {
+        console.error("Error reading file:", error);
+        alert("Error reading file. Please try again.");
+      };
       reader.readAsDataURL(file);
-    }else {
-        console.warn("handleSelect triggered, but no file was found.");
     }
+  };
+
+  const handleChooseFileClick = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -156,53 +168,50 @@ const EditProfile = () => {
 
             {/* Image Upload Section */}
             <div className="space-y-3">
-  <label className="text-sm font-medium text-ascent-1">
-    Profile Picture
-  </label>
-  
-  {/* Image Preview Container */}
-  <div className="relative w-32 h-32 mx-auto bg-secondary rounded-full flex items-center justify-center">
-    {imagePreview ? (
-      <img
-        src={imagePreview}
-        alt="Preview"
-        className="w-full h-full object-cover rounded-full"
-      />
-    ) : (
-      <div className="text-ascent-2 text-sm text-center">
-        No Image
-      </div>
-    )}
-  </div>
+              <label className="text-sm font-medium text-ascent-1">
+                Profile Picture
+              </label>
 
-  {/* --- REVISED FILE INPUT AND LABEL --- */}
-  
-  {/* The actual file input is now separate and hidden */}
-  <input
-    type="file"
-    className="hidden"
-    id="imgUpload"
-    onChange={(e) => {
-      // This is the most important log. If you see this, we've fixed it.
-      console.log("✅ --- INPUT ONCHANGE FIRED! --- ✅");
-      handleSelect(e);
-    }}
-    accept="image/*"
-  />
+              {/* Image Preview Container */}
+              <div className="relative w-32 h-32 mx-auto bg-secondary rounded-full flex items-center justify-center overflow-hidden">
+                {imagePreview ? (
+                  <img
+                    src={imagePreview}
+                    alt="Profile Preview"
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  <div className="text-ascent-2 text-sm text-center">
+                    No Image
+                  </div>
+                )}
+              </div>
 
-  {/* The label is now only for triggering the hidden input */}
-  <label
-    htmlFor="imgUpload"
-    className="flex items-center justify-center gap-2 text-base text-ascent-2 hover:text-ascent-1 cursor-pointer"
-  >
-    <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
-      Choose File
-    </span>
-    <span className="text-ascent-2 text-xs">
-      {picture ? picture.name : "No file chosen"}
-    </span>
-  </label>
-</div>
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                onChange={handleFileSelect}
+                accept="image/*"
+              />
+
+              {/* Custom file selection button */}
+              <div className="flex flex-col items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleChooseFileClick}
+                  className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 transition-colors"
+                >
+                  Choose File
+                </button>
+                {picture && (
+                  <span className="text-ascent-2 text-xs text-center">
+                    {picture.name}
+                  </span>
+                )}
+              </div>
+            </div>
 
             {errMsg?.message && (
               <span

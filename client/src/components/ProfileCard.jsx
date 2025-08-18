@@ -16,7 +16,7 @@ import moment from "moment";
 import { FaTwitterSquare } from "react-icons/fa";
 
 const ProfileCard = ({ user }) => {
-  const { user: data, edit } = useSelector((state) => state.user);
+  const { user: data } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   return (
     <div>

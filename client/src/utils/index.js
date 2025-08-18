@@ -30,20 +30,21 @@ export const apiRequest = async ({ url, token, data, method }) => {
 export const handleFileUpload = async (uploadFile) => {
   try {
     console.log("uploadFile", uploadFile);
+    const cloudName = "duxz0nau4";
     const formData = new FormData();
     formData.append("file", uploadFile);
-    formData.append("upload_preset", "SocialMediaApp");
+    formData.append("upload_preset", "moments_avatars");
+    formData.append("cloud_name", "duxz0nau4");
     const response = await axios.post(
-      `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_ID}/image/upload`,
+      `https://api.cloudinary.com/v1_1/${cloudName}/upload`,
       formData
     );
     console.log("response", response);
-    return response.data.secure_url;
+    return response.data.url;
   } catch (error) {
     console.log("error", error);
   }
 };
-
 export const fetchPosts = async (token, dispatch, uri, data) => {
   try {
     const res = await apiRequest({

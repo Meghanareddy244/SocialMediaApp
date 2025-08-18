@@ -6,7 +6,7 @@ import { BiComment, BiLike, BiSolidLike } from "react-icons/bi";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { useForm } from "react-hook-form";
 import { TextInput, Loading, CustomButton } from "../components";
-import { apiRequest, likePost } from "../utils";
+import { apiRequest } from "../utils";
 
 const getPostComments = async (id) => {
   try {
@@ -195,10 +195,9 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
             </Link>
             <span className="text-ascent-2">{post?.userId?.location}</span>
             <span className="md:hidden flex text-ascent-2 text-xs">
-            {moment(post?.createdAt ?? "2023-05-25").fromNow()}
-          </span>
+              {moment(post?.createdAt ?? "2023-05-25").fromNow()}
+            </span>
           </div>
-
         </div>
       </div>
 
@@ -224,12 +223,32 @@ const PostCard = ({ post, user, deletePost, likePost }) => {
               </span>
             ))}
         </p>
+
+        {/* Media Content */}
         {post?.image && (
-          <img
-            src={post?.image}
-            alt="post image"
-            className="w-full mt-2 rounded-lg"
-          />
+          <div className="w-full mt-2">
+            {/* Check if it's a video file */}
+            {post?.image?.includes(".mp4") ||
+            post?.image?.includes(".wav") ||
+            post?.image?.includes("video/") ? (
+              <video
+                src={post?.image}
+                controls
+                className="w-full rounded-lg"
+                preload="metadata"
+              >
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              /* Check if it's a GIF or regular image */
+              <img
+                src={post?.image}
+                alt="post media"
+                className="w-full rounded-lg"
+                loading="lazy"
+              />
+            )}
+          </div>
         )}
       </div>
       <div className="mt-4 flex justify-between items-center px-3 py-2 text-ascent-2 text-base border-t border-[#66666645]">
